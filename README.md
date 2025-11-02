@@ -114,22 +114,22 @@ LibvirtSnapBak will detect the presence of manual external snapshots on a virtua
     ```bash
     sudo /path/to/libvirtsnapbak.sh -b=/path/to/your-backup-dir -m=diff -d=your-domain0 -d=your-domain1 -p=28
     ```
-2. To backup all virtual machines in 'copy' mode, excluding 'your-domain2':
+2. To backup all virtual machines in 'copy' mode, excluding a virtual machine named 'your-domain2':
    
     ```bash
     sudo /path/to/libvirtsnapbak.sh -b=/path/to/your-backup-dir -m=copy -a -e=your-domain2
     ```
-3. To consolidate an existing differential into the base image on 'your-domain3':
+3. To consolidate an existing differential into the base image on a virtual machine named 'your-domain3':
    
     ```bash
     sudo /path/to/libvirtsnapbak.sh -b=/path/to/your-backup-dir -m=consolidate -d=your-domain3
     ```
-4. To backup (and consolidate) all virtual machines in 'archive' mode, excluding 'your-domain4':  
+4. To backup (and consolidate) all virtual machines in 'archive' mode, excluding a virtual machine named 'your-domain4':  
 
     ```bash
     sudo /path/to/libvirtsnapbak.sh -b=/path/to/your-backup-dir -m=archive -a -e=your-domain4
     ```
-5. To stop (and consolidate) an existing differential on 'your-domain5':  
+5. To stop (and consolidate) an existing differential on a virtual machine named 'your-domain5':  
     ```
     sudo /path/to/libvirtsnapbak.sh -b=/path/to/your-backup-dir -m=stop -d=your-domain5
     ```
