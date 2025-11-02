@@ -154,4 +154,6 @@ For example, to schedule a run in diff mode on all domains (with pruning) every 
     ```
 ## Copyright
 Copyright (C) 2025 Jeff Pollard - <libvirtsnapbak@outlook.com>  
+
+This file is part of LibvirtSnapBak, licensed under the GNU AGPLv3.  
 See LICENSE file for further details.
