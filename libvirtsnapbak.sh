@@ -23,7 +23,7 @@
 set -o pipefail
 
 # Set Global Constants
-_APP_VERSION="1.0.0"
+_APP_VERSION="1.0.1"
 _APP_NAME="LibvirtSnapBak"
 _QEMU_IMG="/usr/bin/qemu-img"
 _VIRSH="/usr/bin/virsh"
