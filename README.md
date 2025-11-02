@@ -19,7 +19,7 @@ git clone https://github.com/libvirtsnapbak/libvirtsnapbak.git
 ```
 ## Usage
 ```bash
-sudo ./path/to/libvirtsnapbak.sh [OPTIONS]
+sudo /path/to/libvirtsnapbak.sh [OPTIONS]
 ```
 ```
 Options:
