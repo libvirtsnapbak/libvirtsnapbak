@@ -63,6 +63,7 @@ _FLAG_ERROR=0
 _LOCK_FD=0
 _DIFF_TIMESTAMP="$(date "+%Y%m%d-%H%M%S")"
 _THIS_BACKING_FILE=""
+_FLAG_DOMAIN_HAS_TEMP=0
 _FLAG_DOMAIN_HAS_BITMAP=0
 _FLAG_DOMAIN_HAS_SNAPSHOT=0
 _FLAG_DOMAIN_HAS_MANUAL=0
@@ -974,6 +975,7 @@ function get_domain_snapshots() {
 
    _ret=0
    _ARR_SNAPSHOT=()
+   _FLAG_DOMAIN_HAS_TEMP=0
    _FLAG_DOMAIN_HAS_SNAPSHOT=0
    _FLAG_DOMAIN_HAS_MANUAL=0
    _FLAG_DOMAIN_HAS_DIFF=0
@@ -1017,6 +1019,13 @@ function check_domain_snapshots() {
 
    if (( _FLAG_DOMAIN_HAS_SNAPSHOT == 1 )); then
       for _thisSnapshot in "${_ARR_SNAPSHOT[@]}"; do
+
+         if [[ "$_thisSnapshot" == "SnapBakTemp" ]]; then
+            _FLAG_DOMAIN_HAS_TEMP=1
+            _msg="Domain: [$_thisDomain] - Remnant SnapBakTemp snapshot detected - will be consolidated into base image"
+            log_message v "$_msg"
+            return $_ret
+         fi
          if [[ "$_thisSnapshot" != "SnapBakDiff" ]]; then
             _FLAG_DOMAIN_HAS_MANUAL=1
             return $_ret
@@ -1122,7 +1131,7 @@ function delete_snapshot() {
    if (( _ret != 0 )); then
       _cmdFlat=$(printf '%q ' "${_cmd[@]}")
       _outputFlat="$(echo "$_output" | tr '\n' ' ')"
-      _msg="Domain: [$_thisDomain] - Error deleting Diff Snapshot - cmd: [$_cmdFlat] - error: [$_ret] - output: [$_outputFlat]"
+      _msg="Domain: [$_thisDomain] - Error deleting Snapshot - cmd: [$_cmdFlat] - error: [$_ret] - output: [$_outputFlat]"
       log_message e "$_msg"
       return $_ret
    fi
@@ -1158,6 +1167,37 @@ function create_snapshot() {
    fi
 
    return $_ret
+}
+
+function delete_temp_snapshot() {
+   local _thisDomain
+   local _thisSnapshot
+   local _ret
+   local _msg
+
+   _thisDomain="$1"
+   _ret=0
+   
+   # Delete remnant temp snapshot and recheck
+   for _thisSnapshot in "${_ARR_SNAPSHOT[@]}"; do
+      if [[ "$_thisSnapshot" == "SnapBakTemp" ]]; then
+         _ret=0
+         delete_snapshot "$_thisDomain" SnapBakTemp || _ret=1
+         if (( _ret == 0 )); then
+            _msg="Domain: [$_thisDomain] - Remnant SnapBakTemp snapshot consolidated into base image"
+            log_message v "$_msg"
+            break
+         else
+            _msg="Domain: [$_thisDomain] - Error: could not consolidate remnant SnapBakTemp snapshot into base image"
+            log_message e "$_msg"
+            return 1
+         fi
+      fi
+   done
+   get_domain_snapshots "$_thisDomain" || return 1
+   check_domain_snapshots "$_thisDomain" || return 1
+
+   return 0
 }
 
 function do_diff() {
@@ -1636,6 +1676,10 @@ function do_snapshots() {
    get_domain_snapshots "$_thisDomain" || return 1
 
    check_domain_snapshots "$_thisDomain" || return 1
+
+   if (( _FLAG_DOMAIN_HAS_TEMP != 0 )); then
+      delete_temp_snapshot "$_thisDomain" || return 1
+   fi
 
    check_domain_backup_mode "$_thisDomain"
 
